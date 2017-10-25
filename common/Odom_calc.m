@@ -1,5 +1,7 @@
 function [s,s_ang] = Odom_calc(x,y,ang,ds,first_time,s_set_x,s_set_y,s_set_ang)
 %
+    s = 0
+    s_ang = 0
     if (first_time < 0.2)               % Set the origin of axis in starting point
         ds_x = ds.Position(1) - s_set_x;% Define x-coordinate
         ds_y = ds.Position(2) - s_set_y;% Define y-coordinate
