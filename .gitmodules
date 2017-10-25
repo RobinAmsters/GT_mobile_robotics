@@ -3,3 +3,6 @@
 [submodule "common/turtlebot3_GT"]
 	path = common/turtlebot3_GT
 	url = https://github.com/RobinAmsters/turtlebot3_GT
+[submodule "mobile_robotics/MR_solutions/"]
+	path = mobile_robotics/MR_solutions/
+	url = git@gitlab.mech.kuleuven.be:u0112384/MR_solutions.git
