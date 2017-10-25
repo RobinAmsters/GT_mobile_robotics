@@ -12,7 +12,7 @@ switch config_ID
         bias = 0;
         show_output = true;
     case 3
-        V = diag([0.05, 2*pi/180].^2);
+        V = diag([0.01, 1*pi/180].^2);
         bias = 0.1;
         show_output = true;
         
