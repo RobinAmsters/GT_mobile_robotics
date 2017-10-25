@@ -1,4 +1,5 @@
 [submodule "wiki"]
+	path=wiki
 	url = https://github.com/RobinAmsters/GT_mobile_robotics.wiki.git
 [submodule "common/turtlebot3_GT"]
 	path = common/turtlebot3_GT
