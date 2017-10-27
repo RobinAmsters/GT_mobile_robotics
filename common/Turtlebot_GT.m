@@ -6,13 +6,14 @@
 %
 % Robin Amsters - 2017
 
-classdef Turtlebot_GT
+classdef Turtlebot_GT < handle
     properties
         ip           % IP address of the robot. By default this should be 192.168.42.1
         turtlebot    % turtlebot object from the MATLAB ROS toolbox
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         s_set        % Defining starting coordinates
+        odom_prev    % Previous position
     end
     methods
         function turtle = Turtlebot_GT(ip)
@@ -22,27 +23,49 @@ classdef Turtlebot_GT
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
-            turtle.s_set = getOdometry(turtle.turtlebot);
+            %             turtle.s_set = getOdometry(turtle.turtlebot);
+            turtle.odom_prev = getOdometry(turtle.turtlebot);
         end
         
-        function [s, s_ang] = odom_calc(turtle)
-            ds = getOdometry(turtle.turtlebot);        % check the current location
-            s_set_x = turtle.s_set.Position(1);        % Define the necessary data from struct format
-            s_set_y = turtle.s_set.Position(2);        % X and Y coordinates are neccesary because
-            s_set_ang = turtle.s_set.Orientation(1);   % The angle with respect to x-axis
-            [s,s_ang] = Odom_calc(ds,s_set_x,s_set_y,s_set_ang);
+        function [ds,dth] = get_Odometry(turtle)
+            % Return distance driven and angle turned since the last call
+            % to this function.
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - ds = Distance driven since the last function call. This
+            %          is defined as: ds = sqrt(dx^2 + dy^2). With dx and
+            %          dy the distance traveled along the x- and y-axes,
+            %          respectively.
+            %   - dth = Angle turned around the vertical axis since the
+            %           last function call.
+            
+            % Get odometry data
+            [odom,~] = getOdometry(turtle.turtlebot);
+            
+            % Extract relevant coordinates
+            dx = odom.Position(1) - turtle.odom_prev.Position(1);
+            dy = odom.Position(2) - turtle.odom_prev.Position(2);
+            dth = odom.Orientation(1) - turtle.odom_prev.Orientation(1);
+            
+            % Convert to distance
+            ds = sqrt(dx^2 + dy^2);
+            
+            % Save current position for next call
+            turtle.odom_prev = odom;
         end
         
         function [scan] = get_scan(turtle)
             % Get data from laser scanner
-            % 
-            % INPUTS: 
+            %
+            % INPUTS:
             %   - None
             % OUTPUTS:
             %   - scan = Laser scan measurements in a struct with field
             %   'Ranges' [360×1 double] and 'Angles' [360×1 double].
             %
-            %   Example: 
+            %   Example:
             %        scan = turtlebot.get_scan()                 % Get LIDAR scan data
             %        [x,y]=pol2cart(scan.Angles,scan.Ranges);    % Convert to Carthesian coordinates
             %        scatter(x,y);                               % Plot coordinates
