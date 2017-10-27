@@ -47,9 +47,9 @@ classdef Turtlebot_GT < handle
             % Extract relevant coordinates
             dx = odom.Position(1) - turtle.odom_prev.Position(1);
             dy = odom.Position(2) - turtle.odom_prev.Position(2);
-            dth = odom.Orientation(1) - turtle.odom_prev.Orientation(1);
+            dth = wrapToPi(odom.Orientation(1) - turtle.odom_prev.Orientation(1));
             
-            % Convert to distance
+            % Conversions
             ds = sqrt(dx^2 + dy^2);
             
             % Save current position for next call
