@@ -77,8 +77,14 @@ classdef Turtlebot_GT < handle
             % Function to apply a linear and angular velocity to the robot
             %
             % INPUTS:
-            %   - v = linear velocity along the X axis of the robot [m/s]
-            %   - w = angular velocity around the Z axis of the robot [rad/s]
+            %   - v = linear velocity along the X axis of the robot [m/s].
+            %         A positive velocity makes the robot drive forwards. A
+            %         negative velocity makes the robot drive backwards.
+            %         Maximum speed is 0.2 m/s.
+            %   - w = angular velocity around the Z axis of the robot
+            %         [rad/s]. A positive velocity makes the robot turn
+            %         counterclockwise. A negative velocity makes the robot
+            %         turn clockwise.
             % OUTPUTS:
             %   - None
             
@@ -89,6 +95,101 @@ classdef Turtlebot_GT < handle
             
             % Publish velocity message
             send(turtle.vel_pub,turtle.vel_msg);
+        end
+        
+        function set_linear_velocity_radius(turtle, v, r)
+            % Moves robot by setting a forward velocity and turning radius.
+            %
+            % INPUTS:
+            %   - v = linear velocity along the X axis of the robot [m/s].
+            %         A positive velocity makes the robot drive forwards. A
+            %         negative velocity makes the robot drive backwards.
+            %         Maximum speed is 0.2 m/s.
+            %   - r = turning radius around the Z axis of the robot [m]. A 
+            %         positive radius makes the robot turn counterclockwise. 
+            %         A negative radius makes the robot turn clockwise. 
+            % OUTPUTS:
+            %   - None
+            
+            % Set linear velocity
+            turtle.vel_msg.Linear.X = v;
+            % Set angular velocity
+            turtle.vel_msg.Angular.Z = v/r;
+            
+            % Publish velocity message
+            send(turtle.vel_pub,turtle.vel_msg);
+        end
+        
+        function drive_straigth(turtle, distance, speed)
+            % Let the robot drive a fixed distance at a certain speed
+            %
+            % INPUTS:
+            %   - distance = distance to travel in meters.
+            %   - speed = speed at which to drive in meters per second.
+            %             A positive velocity makes the robot drive
+            %             forwards. A negative velocity makes the robot
+            %             drive backwards. Maximum speed is 0.2 m/s.
+            % OUTPUTS:
+            %   - None
+            
+            s = 0;
+            turtle.set_linear_angular_velocity(speed, 0);
+            
+            while abs(s) < distance
+                [ds,~] = get_Odometry(turtle);
+                s = s + ds;
+            end
+            turtle.stop()
+            
+        end
+        
+        function drive_arc(turtle, speed, angle, r)
+            % Let the robot drive a fixed distance at a certain speed
+            %
+            % INPUTS:
+            %   - speed = speed at which to drive in meters per second.
+            %             A positive velocity makes the robot drive
+            %             forwards. A negative velocity makes the robot
+            %             drive backwards. Maximum speed is 0.2 m/s.
+            %   - angle = angle of arc segment to turn in radians
+            %   - r = radius of the arc in meters. A positive radius makes
+            %         the robot turn counterclockwise. A negative radius
+            %         makes the robot turn clockwise.
+            % OUTPUTS:
+            %   - None
+            
+            th = 0;
+            turtle.set_linear_velocity_radius(speed, r);
+            
+            while abs(th) < angle
+                [~,dth] = get_Odometry(turtle);
+                th = th + dth;
+            end
+            turtle.stop()
+            
+        end
+        
+        function turn_angle(turtle, angle, angular_speed)
+            % Let the robot turn a fixed angle at a certain angular speed
+            %
+            % INPUTS:
+            %   - angle = angle to turn in radians
+            %   - angular_speed = speed at which to turn in radians per
+            %                     second. A positive velocity makes the
+            %                     robot turn counterclockwise. A negative
+            %                     velocity makes the robot turn clockwise.
+            % OUTPUTS:
+            %   - None
+            
+            th = 0;
+            turtle.set_linear_angular_velocity(0, angular_speed);
+            
+            while abs(th) < angle
+                [~,dth] = get_Odometry(turtle);
+                th = th + dth;
+            end
+            turtle.stop()
+            
         end
         
         function stop(turtle)
