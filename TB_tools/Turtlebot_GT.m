@@ -120,7 +120,7 @@ classdef Turtlebot_GT < handle
             send(turtle.vel_pub,turtle.vel_msg);
         end
         
-        function drive_straigth(turtle, distance, speed)
+        function drive_straight(turtle, distance, speed)
             % Let the robot drive a fixed distance at a certain speed
             %
             % INPUTS:
