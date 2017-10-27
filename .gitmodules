@@ -1,8 +1,5 @@
 [submodule "wiki"]
 	path=wiki
 	url = https://github.com/RobinAmsters/GT_mobile_robotics.wiki.git
-[submodule "common/turtlebot3_GT"]
-	path = other/turtlebot3_GT
-	url = https://github.com/RobinAmsters/turtlebot3_GT
 [submodule "mobile_robotics/MR_solutions"]
 	url = git@gitlab.mech.kuleuven.be:u0112384/MR_solutions.git
