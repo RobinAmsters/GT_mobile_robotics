@@ -22,20 +22,17 @@ turtlebot = Turtlebot_GT(ip); % Make Turtlebot object
 
 for i=0:$
     
-    % set actuator for straight 
-    while 
+    % set actuator for straight
+    while
         % go straight
     end
     
     % set actuator for turn
-    while 
+    while
         % turn
     end
     
     % repeat x times
-end
-
-% stop the roomba
 end
 
 ??? % Find the function to make the robot stop
