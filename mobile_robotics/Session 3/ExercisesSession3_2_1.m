@@ -1,4 +1,3 @@
-function finite_state_machine(Roomba)
 %% Parameters
 currentState='findWall';
 v=$;
@@ -46,7 +45,7 @@ while true
             end
             
         otherwise
-            setFwdVelRadius(Roomba,0,inf)
+            turtlebot.stop()
             disp('error, unknown state, break'); % this will never happen...
             break;
     end

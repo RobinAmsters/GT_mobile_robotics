@@ -93,7 +93,7 @@ while toc <= t_test
     end
     
     %% KALMAN FILTER FUSION
-    R = estimatedCovariance;
+    R = R;
     v = pose_PF - pose_EKF;
     K = Pcov_EKF*C'*inv(C*Pcov_EKF*C' + R);
     pose_EKF = pose_EKF + K*v;

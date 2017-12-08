@@ -27,7 +27,7 @@ pose = [5;5;0];
 Pcov = 0.01*eye(3);
 
 % drive square and map environment
-dist = 1;
+dist = 0.25;
 angle = pi/2;
 speed = 0.1;
 for i=1:4
