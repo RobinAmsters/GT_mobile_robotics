@@ -25,7 +25,7 @@ classdef Turtlebot_GT < handle
             turtle.odom_prev = getOdometry(turtle.turtlebot);
         end
         
-        function [ds,dth] = get_Odometry(turtle)
+        function [ds,dth] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
             %
@@ -134,7 +134,7 @@ classdef Turtlebot_GT < handle
             turtle.set_linear_angular_velocity(speed, 0);
             
             while abs(s) < distance
-                [ds,~] = get_Odometry(turtle);
+                [ds,~] = get_odometry(turtle);
                 s = s + ds;
             end
             turtle.stop()
@@ -160,7 +160,7 @@ classdef Turtlebot_GT < handle
             turtle.set_linear_velocity_radius(speed, r);
             
             while abs(th) < angle
-                [~,dth] = get_Odometry(turtle);
+                [~,dth] = get_odometry(turtle);
                 th = th + dth;
             end
             turtle.stop()
@@ -183,7 +183,7 @@ classdef Turtlebot_GT < handle
             turtle.set_linear_angular_velocity(0, angular_speed);
             
             while abs(th) < angle
-                [~,dth] = get_Odometry(turtle);
+                [~,dth] = get_odometry(turtle);
                 th = th + dth;
             end
             turtle.stop()

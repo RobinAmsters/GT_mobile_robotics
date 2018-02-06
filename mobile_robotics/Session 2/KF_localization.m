@@ -72,7 +72,7 @@ tic
 while toc <= t_test
     %% PREDICT
     % Receive laser scan and odometry DATA
-    [ds,dth] = turtlebot.get_Odometry();
+    [ds,dth] = turtlebot.get_odometry();
     scan = turtlebot.get_scan();
     
     % Predict new pose with motion model
