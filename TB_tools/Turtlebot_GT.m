@@ -12,7 +12,6 @@ classdef Turtlebot_GT < handle
         turtlebot    % turtlebot object from the MATLAB ROS toolbox
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
-        s_set        % Defining starting coordinates
         odom_prev    % Previous position
     end
     methods
@@ -23,7 +22,6 @@ classdef Turtlebot_GT < handle
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
-            %             turtle.s_set = getOdometry(turtle.turtlebot);
             turtle.odom_prev = getOdometry(turtle.turtlebot);
         end
         
