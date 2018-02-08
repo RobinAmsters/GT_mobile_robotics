@@ -37,7 +37,7 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - V_battery = battery voltage [V]
             
-            sensor_msg = receive(turtle.sensor_sub,turtle.timeout)
+            sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             V_battery = sensor_msg.Battery;
         end  
         
