@@ -15,10 +15,10 @@
 iptables-restore < /etc/iptables.ipv4.nat
 
 # Startup access point services
-/sbin/ifup wlan0 
-/usr/sbin/service /usr/sbin/dnsmasq start
+/sbin/ifup wlan0
+service dnsmasq start
 
 # Update git repositories if connected to the internet
-git -C ~/catkin_ws/src/turtlebot3_GT/ pull
-git -C ~/GT_mobile_robotics/ pull
+# git -C ~/GT_mobile_robotics/ pull
+
 exit 0
