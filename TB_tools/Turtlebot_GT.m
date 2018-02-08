@@ -13,6 +13,8 @@ classdef Turtlebot_GT < handle
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         odom_prev    % Previous position
+        sensor_sub  % Subscriber to sensor state
+        timeout      % Number of seconds to wait for ros messages
     end
     methods
         function turtle = Turtlebot_GT(ip)
@@ -23,6 +25,8 @@ classdef Turtlebot_GT < handle
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
             turtle.odom_prev = getOdometry(turtle.turtlebot);
+            turtle.sensor_sub = rossubscriber('/sensor_state');
+            turtle.timeout = 1.0; % Let subscribers wait for a maximum number of seconds
         end
         
         function [ds,dth] = get_odometry(turtle)
