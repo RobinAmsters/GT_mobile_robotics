@@ -1,10 +1,26 @@
 % Costum turtlebot class definition for use in GT mobile robotics education
 %
 % Properties:
+%     ip           % IP address of the robot. By default this should be 192.168.42.1
+%     turtlebot    % turtlebot object from the MATLAB ROS toolbox
+%     vel_pub      % publisher object for the /cmd_vel node
+%     vel_msg      % Twist message that gets published by the velocity publisher
+%     odom_prev    % Previous position
+%     sensor_sub  % Subscriber to sensor state
+%     timeout      % Number of seconds to wait for ros messages
 %
 % Functions:
+%   [V_battery] = get_battery_voltage(turtle)
+%   [ds,dth] = get_odometry(turtle)
+%   [scan] = get_scan(turtle)
+%   set_linear_angular_velocity(turtle, v, w)
+%   set_linear_velocity_radius(turtle, v, r)
+%   drive_straight(turtle, distance, speed)
+%   drive_arc(turtle, speed, angle, r)
+%   turn_angle(turtle, angle, angular_speed)
+%   stop(turtle)
 %
-% Robin Amsters - 2017
+% Robin Amsters - 2017-2018
 
 classdef Turtlebot_GT < handle
     properties
@@ -30,7 +46,7 @@ classdef Turtlebot_GT < handle
         end
         
         function [V_battery] = get_battery_voltage(turtle)
-            % Returns the voltage of the battery
+            % Return battery voltage of the Turtlebot
             %
             % INPUTS:
             %   - None
@@ -87,7 +103,7 @@ classdef Turtlebot_GT < handle
             scan = getLaserScan(turtle.turtlebot);
         end
         
-        function set_linear_angular_velocity(turtle, v,w)
+        function set_linear_angular_velocity(turtle, v, w)
             % Function to apply a linear and angular velocity to the robot
             %
             % INPUTS:
