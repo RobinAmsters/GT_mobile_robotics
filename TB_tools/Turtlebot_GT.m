@@ -29,6 +29,18 @@ classdef Turtlebot_GT < handle
             turtle.timeout = 1.0; % Let subscribers wait for a maximum number of seconds
         end
         
+        function [V_battery] = get_battery_voltage(turtle)
+            % Returns the voltage of the battery
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - V_battery = battery voltage [V]
+            
+            sensor_msg = receive(turtle.sensor_sub,turtle.timeout)
+            V_battery = sensor_msg.Battery;
+        end  
+        
         function [ds,dth] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
