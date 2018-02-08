@@ -3,3 +3,4 @@
 *.zip
 
 map\.mat
+common/matlab_gen/*
