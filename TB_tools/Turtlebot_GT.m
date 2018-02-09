@@ -55,7 +55,24 @@ classdef Turtlebot_GT < handle
             
             sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             V_battery = sensor_msg.Battery;
-        end  
+        end
+        
+        function [enc_left, enc_right] = get_encoder_counts(turtle)
+            % Return left and right encoder counters. 
+            % WARNING: occasionaly this value, which is an 12 bit integer,
+            % overflows. Causing very large discontinuities in wheel speed
+            % calculations
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - enc_left = left encoder counter value [tics]
+            %   - enc_right = right encoder counter value [tics]
+            
+            sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
+            enc_left = sensor_msg.LeftEncoder;
+            enc_right = sensor_msg.RightEncoder;
+        end
         
         function [ds,dth] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
