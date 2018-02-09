@@ -14,8 +14,10 @@
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
+%   [enc_left, enc_right] = get_encoder_counts(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
+%   set_wheel_speeds(turtle, W_R, W_L)
 %   set_linear_angular_velocity(turtle, v, w)
 %   set_linear_velocity_radius(turtle, v, r)
 %   drive_straight(turtle, distance, speed)
