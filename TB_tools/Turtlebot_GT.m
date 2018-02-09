@@ -120,6 +120,29 @@ classdef Turtlebot_GT < handle
             scan = getLaserScan(turtle.turtlebot);
         end
         
+        function set_wheel_speeds(turtle, W_R, W_L)
+            % Set the speed of the individual wheels
+            % 
+            % INPUTS:
+            %   - W_R = rotational speed of right wheel [rad/s]
+            %   - W_L = rotational speed of left wheel [rad/s]
+            %
+            % OUTPUTS:
+            %   - None
+            
+            % Translate to forward and angular velocity
+            v = (turtle.R/2)*(W_R+W_L);
+            w = (turtle.R/turtle.B)*(W_R-W_L);
+            
+            % Construct Twist message
+            turtle.vel_msg.Linear.X = v; 
+            turtle.vel_msg.Angular.Z = w;
+            
+            % Publish velocity message
+            send(turtle.vel_pub,turtle.vel_msg);
+            
+        end
+        
         function set_linear_angular_velocity(turtle, v, w)
             % Function to apply a linear and angular velocity to the robot
             %
