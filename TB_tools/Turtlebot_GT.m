@@ -1,13 +1,16 @@
 % Costum turtlebot class definition for use in GT mobile robotics education
 %
 % Properties:
-%     ip           % IP address of the robot. By default this should be 192.168.42.1
-%     turtlebot    % turtlebot object from the MATLAB ROS toolbox
-%     vel_pub      % publisher object for the /cmd_vel node
-%     vel_msg      % Twist message that gets published by the velocity publisher
-%     odom_prev    % Previous position
-%     sensor_sub  % Subscriber to sensor state
-%     timeout      % Number of seconds to wait for ros messages
+%     ip: IP address of the robot. By default this should be 192.168.42.1
+%     turtlebot: turtlebot object from the MATLAB ROS toolbox
+%     vel_pub: publisher object for the /cmd_vel node
+%     vel_msg:  Twist message that gets published by the velocity publisher
+%     odom_prev: Previous position
+%     sensor_sub: Subscriber to sensor state
+%     timeout: Number of seconds to wait for ros messages
+%     R: Wheel radius [m], default = 0.033
+%     B: Wheelbase [m], default = 0.16
+%     tick_to_rad: Conversion factor for ticks to radians [rad/tick], default = 0.001533981 
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
@@ -29,8 +32,11 @@ classdef Turtlebot_GT < handle
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         odom_prev    % Previous position
-        sensor_sub  % Subscriber to sensor state
+        sensor_sub   % Subscriber to sensor state
         timeout      % Number of seconds to wait for ros messages
+        R = 0.033;   % Radius of wheels [m]
+        B = 0.16;    % Wheelbase [m]
+        tick_to_rad = 0.001533981 % Conversion factor [rad/tick](found in turtlebot3_core_config.h)
     end
     methods
         function turtle = Turtlebot_GT(ip)
@@ -175,9 +181,9 @@ classdef Turtlebot_GT < handle
             %         A positive velocity makes the robot drive forwards. A
             %         negative velocity makes the robot drive backwards.
             %         Maximum speed is 0.2 m/s.
-            %   - r = turning radius around the Z axis of the robot [m]. A 
-            %         positive radius makes the robot turn counterclockwise. 
-            %         A negative radius makes the robot turn clockwise. 
+            %   - r = turning radius around the Z axis of the robot [m]. A
+            %         positive radius makes the robot turn counterclockwise.
+            %         A negative radius makes the robot turn clockwise.
             % OUTPUTS:
             %   - None
             
