@@ -64,7 +64,7 @@ classdef Turtlebot_GT < handle
         end
         
         function [enc_left, enc_right] = get_encoder_counts(turtle)
-            % Return left and right encoder counters. 
+            % Returns left and right encoder counter values. 
             % WARNING: occasionaly this value, which is an 12 bit integer,
             % overflows. Causing very large discontinuities in wheel speed
             % calculations
@@ -127,11 +127,15 @@ classdef Turtlebot_GT < handle
         end
         
         function set_wheel_speeds(turtle, W_R, W_L)
-            % Set the speed of the individual wheels
+            % Set the rotational speed of the left and right wheel
             % 
             % INPUTS:
-            %   - W_R = rotational speed of right wheel [rad/s]
-            %   - W_L = rotational speed of left wheel [rad/s]
+            %   - W_R = rotational speed of right wheel [rad/s]. A positive
+            %           value results in clockwise rotation. A negative
+            %           value results in counterclockwise rotation.
+            %   - W_L = rotational speed of left wheel [rad/s]. A positive
+            %           value results in clockwise rotation. A negative
+            %           value results in counterclockwise rotation.
             %
             % OUTPUTS:
             %   - None
