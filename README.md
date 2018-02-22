@@ -8,7 +8,9 @@ Both this code repository and the wiki are currently maintained by Robin Amsters
 
 ## Release notes
 
-Current version: v0.2
+Current version: v0.21
+
+**22-02-2018** (v0.21): Bug fix: files in common/turtlebot3_msgs are now in sync with the files on the Turtlebot. New message generation with the script *generate_messages.m* is required. The functions 'get_battery_voltage' and 'get_encoder_counts' will then work.
 
 **13-02-2018** (v0.2): Updated for Embedded control systems
 
