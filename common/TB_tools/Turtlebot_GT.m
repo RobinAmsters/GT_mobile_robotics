@@ -11,6 +11,12 @@
 %     R: Wheel radius [m], default = 0.033
 %     B: Wheelbase [m], default = 0.16
 %     tick_to_rad: Conversion factor for ticks to radians [rad/tick], default = 0.001533981 
+%     w_max: maximum rotational speed [rad/s], default = 2.5. Requesting a
+%     higher speed will result in the output being saturated and a warning
+%     being raised.
+%     v_max: maximum forward speed [m/s], default = 0.2. Requesting a
+%     higher speed will result in the output being saturated and a warning
+%     being raised.
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
@@ -39,6 +45,8 @@ classdef Turtlebot_GT < handle
         R = 0.033;   % Radius of wheels [m]
         B = 0.16;    % Wheelbase [m]
         tick_to_rad = 0.001533981 % Conversion factor [rad/tick](found in turtlebot3_core_config.h)
+        w_max = 2.5 % Maximum rotational velocity of the Turtlebot [rad/s]. When attempting to apply a higher speed, the output will saturate to this value.
+        v_max = 0.2 % Maximum forward speed for the Turtlebot [m/s]. When attempting to apply a higher speed, the output will saturate to this value.
     end
     methods
         function turtle = Turtlebot_GT(ip)
@@ -148,6 +156,16 @@ classdef Turtlebot_GT < handle
             v = (turtle.R/2)*(W_R+W_L);
             w = (turtle.R/turtle.B)*(W_R-W_L);
             
+            if v >= turtle.v_max
+                warning(strcat('Requested linear velocity is larger than maximum, saturating output on: ', num2str(turtle.v_max), ' [m/s]'))
+                v = turtle.v_max;
+            end
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
+            
             % Construct Twist message
             turtle.vel_msg.Linear.X = v; 
             turtle.vel_msg.Angular.Z = w;
@@ -172,6 +190,16 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - None
             
+            if v >= turtle.v_max
+                warning(strcat('Requested linear velocity is larger than maximum, saturating output on: ', num2str(turtle.v_max), ' [m/s]'))
+                v = turtle.v_max;
+            end
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
+            
             % Set linear velocity
             turtle.vel_msg.Linear.X = v;
             % Set angular velocity
@@ -195,10 +223,17 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - None
             
+            w = v/r;
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
+            
             % Set linear velocity
             turtle.vel_msg.Linear.X = v;
             % Set angular velocity
-            turtle.vel_msg.Angular.Z = v/r;
+            turtle.vel_msg.Angular.Z = w;
             
             % Publish velocity message
             send(turtle.vel_pub,turtle.vel_msg);
