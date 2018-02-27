@@ -14,7 +14,7 @@
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
-%   [enc_left, enc_right] = get_encoder_counts(turtle)
+%   [enc_left, enc_right, time] = get_encoder_counts(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
 %   set_wheel_speeds(turtle, W_R, W_L)
@@ -65,7 +65,7 @@ classdef Turtlebot_GT < handle
             V_battery = sensor_msg.Battery;
         end
         
-        function [enc_left, enc_right] = get_encoder_counts(turtle)
+        function [enc_left, enc_right, time] = get_encoder_counts(turtle)
             % Returns left and right encoder counter values. 
             % WARNING: occasionaly this value, which is an 12 bit integer,
             % overflows. Causing very large discontinuities in wheel speed
@@ -76,10 +76,12 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - enc_left = left encoder counter value [tics]
             %   - enc_right = right encoder counter value [tics]
+            %   - time = message timestamp converted to UNIX time [s]
             
             sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             enc_left = sensor_msg.LeftEncoder;
             enc_right = sensor_msg.RightEncoder;
+            time = to_sec(sensor_msg.Stamp);
         end
         
         function [ds,dth] = get_odometry(turtle)
