@@ -10,11 +10,17 @@
 %     timeout: Number of seconds to wait for ros messages
 %     R: Wheel radius [m], default = 0.033
 %     B: Wheelbase [m], default = 0.16
-%     tick_to_rad: Conversion factor for ticks to radians [rad/tick], default = 0.001533981 
+%     tick_to_rad: Conversion factor for ticks to radians [rad/tick], default = 0.001533981
+%     w_max: maximum rotational speed [rad/s], default = 2.5. Requesting a
+%     higher speed will result in the output being saturated and a warning
+%     being raised.
+%     v_max: maximum forward speed [m/s], default = 0.2. Requesting a
+%     higher speed will result in the output being saturated and a warning
+%     being raised.
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
-%   [enc_left, enc_right] = get_encoder_counts(turtle)
+%   [enc_left, enc_right, time] = get_encoder_counts(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
 %   set_wheel_speeds(turtle, W_R, W_L)
@@ -33,12 +39,15 @@ classdef Turtlebot_GT < handle
         turtlebot    % turtlebot object from the MATLAB ROS toolbox
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
+        odom_sub     % Subscriber to /odom topic
         odom_prev    % Previous position
         sensor_sub   % Subscriber to sensor state
         timeout      % Number of seconds to wait for ros messages
         R = 0.033;   % Radius of wheels [m]
         B = 0.16;    % Wheelbase [m]
         tick_to_rad = 0.001533981 % Conversion factor [rad/tick](found in turtlebot3_core_config.h)
+        w_max = 2.5 % Maximum rotational velocity of the Turtlebot [rad/s]. When attempting to apply a higher speed, the output will saturate to this value.
+        v_max = 0.2 % Maximum forward speed for the Turtlebot [m/s]. When attempting to apply a higher speed, the output will saturate to this value.
     end
     methods
         function turtle = Turtlebot_GT(ip)
@@ -48,6 +57,7 @@ classdef Turtlebot_GT < handle
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
+            turtle.odom_sub = rossubscriber('/odom');
             turtle.odom_prev = getOdometry(turtle.turtlebot);
             turtle.sensor_sub = rossubscriber('/sensor_state');
             turtle.timeout = 1.0; % Let subscribers wait for a maximum number of seconds
@@ -65,8 +75,8 @@ classdef Turtlebot_GT < handle
             V_battery = sensor_msg.Battery;
         end
         
-        function [enc_left, enc_right] = get_encoder_counts(turtle)
-            % Returns left and right encoder counter values. 
+        function [enc_left, enc_right, time] = get_encoder_counts(turtle)
+            % Returns left and right encoder counter values.
             % WARNING: occasionaly this value, which is an 12 bit integer,
             % overflows. Causing very large discontinuities in wheel speed
             % calculations
@@ -76,12 +86,29 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - enc_left = left encoder counter value [tics]
             %   - enc_right = right encoder counter value [tics]
+            %   - time = message timestamp converted to UNIX time [s]
             
             sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             enc_left = sensor_msg.LeftEncoder;
             enc_right = sensor_msg.RightEncoder;
+            t_ros_msg = sensor_msg.Stamp;
+            time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
         end
         
+        function [v, w] = get_linear_angular_velocity(turtle)
+            % Return measured linear and angular velocity
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - v = forward velocity along direction of turtlebot [m/s]
+            %   - w = angular velocity around vertical [rad/s]
+            
+            odom_msg = receive(turtle.odom_sub,turtle.timeout);
+            v = odom_msg.Twist.Twist.Linear.X;
+            w = odom_msg.Twist.Twist.Angular.Z;
+            
+        end
         function [ds,dth] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
@@ -130,7 +157,7 @@ classdef Turtlebot_GT < handle
         
         function set_wheel_speeds(turtle, W_R, W_L)
             % Set the rotational speed of the left and right wheel
-            % 
+            %
             % INPUTS:
             %   - W_R = rotational speed of right wheel [rad/s]. A positive
             %           value results in clockwise rotation. A negative
@@ -146,8 +173,18 @@ classdef Turtlebot_GT < handle
             v = (turtle.R/2)*(W_R+W_L);
             w = (turtle.R/turtle.B)*(W_R-W_L);
             
+            if v >= turtle.v_max
+                warning(strcat('Requested linear velocity is larger than maximum, saturating output on: ', num2str(turtle.v_max), ' [m/s]'))
+                v = turtle.v_max;
+            end
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
+            
             % Construct Twist message
-            turtle.vel_msg.Linear.X = v; 
+            turtle.vel_msg.Linear.X = v;
             turtle.vel_msg.Angular.Z = w;
             
             % Publish velocity message
@@ -169,6 +206,16 @@ classdef Turtlebot_GT < handle
             %         turn clockwise.
             % OUTPUTS:
             %   - None
+            
+            if v >= turtle.v_max
+                warning(strcat('Requested linear velocity is larger than maximum, saturating output on: ', num2str(turtle.v_max), ' [m/s]'))
+                v = turtle.v_max;
+            end
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
             
             % Set linear velocity
             turtle.vel_msg.Linear.X = v;
@@ -193,10 +240,17 @@ classdef Turtlebot_GT < handle
             % OUTPUTS:
             %   - None
             
+            w = v/r;
+            
+            if w >= turtle.w_max
+                warning(strcat('Requested angular velocity is larger than maximum, saturating output on: ', num2str(turtle.w_max), ' [rad/s]'))
+                w = turtle.w_max;
+            end
+            
             % Set linear velocity
             turtle.vel_msg.Linear.X = v;
             % Set angular velocity
-            turtle.vel_msg.Angular.Z = v/r;
+            turtle.vel_msg.Angular.Z = w;
             
             % Publish velocity message
             send(turtle.vel_pub,turtle.vel_msg);

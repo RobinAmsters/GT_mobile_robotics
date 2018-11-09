@@ -8,7 +8,18 @@ Both this code repository and the wiki are currently maintained by Robin Amsters
 
 ## Release notes
 
-Current version: v0.2
+Current version: v0.22
+
+**27-02-2018** (v0.22): 
+
+- Improvements: 
+    - Return ROS timestamp in get_encoder_counts for more consistent speed calculations. 
+    - Limit speed setting functions to maximum speed. Raise warning and saturate if maximum speed is exceeded.
+
+**22-02-2018** (v0.21): 
+
+- Bug fixes: 
+  - files in common/turtlebot3_msgs are now in sync with the files on the Turtlebot. New message generation with the script *generate_messages.m* is required. The functions 'get_battery_voltage' and 'get_encoder_counts' will then work.
 
 **13-02-2018** (v0.2): Updated for Embedded control systems
 
