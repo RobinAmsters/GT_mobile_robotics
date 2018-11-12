@@ -2,25 +2,29 @@
 %
 % Properties:
 %     ip: IP address of the robot. By default this should be 192.168.42.1
-%     turtlebot: turtlebot object from the MATLAB ROS toolbox
-%     vel_pub: publisher object for the /cmd_vel node
+%     turtlebot: turtlebot object from the MATLAB ROS toolbox You can use 
+%                this to access the functions from the Turtlebot Support 
+%                Package, but you will rarely need those.
+%     vel_pub: publisher object for the /cmd_vel topic
 %     vel_msg:  Twist message that gets published by the velocity publisher
 %     odom_prev: Previous position
 %     sensor_sub: Subscriber to sensor state
 %     timeout: Number of seconds to wait for ros messages
-%     R: Wheel radius [m], default = 0.033
-%     B: Wheelbase [m], default = 0.16
-%     tick_to_rad: Conversion factor for ticks to radians [rad/tick], default = 0.001533981
-%     w_max: maximum rotational speed [rad/s], default = 2.5. Requesting a
-%     higher speed will result in the output being saturated and a warning
-%     being raised.
-%     v_max: maximum forward speed [m/s], default = 0.2. Requesting a
-%     higher speed will result in the output being saturated and a warning
-%     being raised.
+%     R: Wheel radius [m], default = 0.033 m
+%     B: Wheelbase [m], default = 0.16 m
+%     tick_to_rad: Conversion factor for ticks to radians [rad/tick],
+%                  default = 0.001533981 rad/tick
+%     w_max: maximum rotational speed [rad/s], default = 2.5 rad/s. 
+%            Requesting a higher speed will result in the output being 
+%            saturated and a warning being raised.
+%     v_max: maximum forward speed [m/s], default = 0.2 m/s. R
+%            Requesting a higher speed will result in the output being 
+%            saturated and a warning being raised.
 %
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
 %   [enc_left, enc_right, time] = get_encoder_counts(turtle)
+%   [v, w] = get_linear_angular_velocity(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
 %   set_wheel_speeds(turtle, W_R, W_L)
@@ -31,7 +35,7 @@
 %   turn_angle(turtle, angle, angular_speed)
 %   stop(turtle)
 %
-% Robin Amsters - 2017-2018
+% Robin Amsters - 2017-2019
 
 classdef Turtlebot_GT < handle
     properties
@@ -66,6 +70,8 @@ classdef Turtlebot_GT < handle
         function [V_battery] = get_battery_voltage(turtle)
             % Return battery voltage of the Turtlebot
             %
+            % Usage: V_battery = turtlebot.get_battery_voltage()
+            %
             % INPUTS:
             %   - None
             % OUTPUTS:
@@ -80,6 +86,8 @@ classdef Turtlebot_GT < handle
             % WARNING: occasionaly this value, which is an 12 bit integer,
             % overflows. Causing very large discontinuities in wheel speed
             % calculations
+            %
+            % Usage: [enc_left, enc_right, time] = turtlebot.get_encoder_counts()
             %
             % INPUTS:
             %   - None
@@ -96,7 +104,10 @@ classdef Turtlebot_GT < handle
         end
         
         function [v, w] = get_linear_angular_velocity(turtle)
-            % Return measured linear and angular velocity
+            % Return measured linear and angular velocity (based on encoder 
+            % tics)
+            %
+            % Usage: [v, w] = turtlebot.get_linear_angular_velocity()
             %
             % INPUTS:
             %   - None
@@ -112,6 +123,8 @@ classdef Turtlebot_GT < handle
         function [ds,dth] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
+            %
+            % Usage: [ds,dth] = turtlebot.get_odometry()
             %
             % INPUTS:
             %   - None
@@ -141,6 +154,8 @@ classdef Turtlebot_GT < handle
         function [scan] = get_scan(turtle)
             % Get data from laser scanner
             %
+            % Usage: [scan] = turtlebot.get_scan()
+            %
             % INPUTS:
             %   - None
             % OUTPUTS:
@@ -157,6 +172,8 @@ classdef Turtlebot_GT < handle
         
         function set_wheel_speeds(turtle, W_R, W_L)
             % Set the rotational speed of the left and right wheel
+            %
+            % Usage: turtlebot.set_wheel_speeds(W_R, W_L)
             %
             % INPUTS:
             %   - W_R = rotational speed of right wheel [rad/s]. A positive
@@ -195,6 +212,8 @@ classdef Turtlebot_GT < handle
         function set_linear_angular_velocity(turtle, v, w)
             % Function to apply a linear and angular velocity to the robot
             %
+            % Usage: turtlebot.set_linear_angular_velocity(v,w)
+            %
             % INPUTS:
             %   - v = linear velocity along the X axis of the robot [m/s].
             %         A positive velocity makes the robot drive forwards. A
@@ -229,6 +248,8 @@ classdef Turtlebot_GT < handle
         function set_linear_velocity_radius(turtle, v, r)
             % Moves robot by setting a forward velocity and turning radius.
             %
+            % Usage: turtlebot.set_linear_velocity_radius(v, r)
+            %
             % INPUTS:
             %   - v = linear velocity along the X axis of the robot [m/s].
             %         A positive velocity makes the robot drive forwards. A
@@ -259,6 +280,8 @@ classdef Turtlebot_GT < handle
         function drive_straight(turtle, distance, speed)
             % Let the robot drive a fixed distance at a certain speed
             %
+            % Usage: turtlebot.drive_straight(distance, speed)
+            %
             % INPUTS:
             %   - distance = distance to travel in meters.
             %   - speed = speed at which to drive in meters per second.
@@ -281,6 +304,8 @@ classdef Turtlebot_GT < handle
         
         function drive_arc(turtle, speed, angle, r)
             % Let the robot drive a fixed distance at a certain speed
+            %
+            % Usage: turtlebot.drive_arc(speed, angle, r)
             %
             % INPUTS:
             %   - speed = speed at which to drive in meters per second.
@@ -308,6 +333,8 @@ classdef Turtlebot_GT < handle
         function turn_angle(turtle, angle, angular_speed)
             % Let the robot turn a fixed angle at a certain angular speed
             %
+            % Usage: turn_angle(turtle, angle, angular_speed)
+            %
             % INPUTS:
             %   - angle = angle to turn in radians
             %   - angular_speed = speed at which to turn in radians per
@@ -330,6 +357,8 @@ classdef Turtlebot_GT < handle
         
         function stop(turtle)
             % Set all speeds of the robot to zerp
+            %
+            % Usage: turtlebot.stop()
             %
             % INPUTS:
             %   -None
