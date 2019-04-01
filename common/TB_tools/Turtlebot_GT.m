@@ -103,21 +103,24 @@ classdef Turtlebot_GT < handle
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
         end
         
-        function [v, w] = get_linear_angular_velocity(turtle)
+        function [v, w, time] = get_linear_angular_velocity(turtle)
             % Return measured linear and angular velocity (based on encoder 
             % tics)
             %
-            % Usage: [v, w] = turtlebot.get_linear_angular_velocity()
+            % Usage: [v, w, time] = turtlebot.get_linear_angular_velocity()
             %
             % INPUTS:
             %   - None
             % OUTPUTS:
             %   - v = forward velocity along direction of turtlebot [m/s]
             %   - w = angular velocity around vertical [rad/s]
+            %   - time = message timestamp converted to UNIX time [s]
             
             odom_msg = receive(turtle.odom_sub,turtle.timeout);
             v = odom_msg.Twist.Twist.Linear.X;
             w = odom_msg.Twist.Twist.Angular.Z;
+            t_ros_msg = odom_msg.Header.Stamp;
+            time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
             
         end
         function [ds,dth] = get_odometry(turtle)
