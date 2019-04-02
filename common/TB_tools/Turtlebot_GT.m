@@ -7,6 +7,8 @@
 %                Package, but you will rarely need those.
 %     vel_pub: publisher object for the /cmd_vel topic
 %     vel_msg:  Twist message that gets published by the velocity publisher
+%     odom_sub: Subscriber to /odom topic
+%     imu_sub: Subscriber to /imu topic
 %     odom_prev: Previous position
 %     sensor_sub: Subscriber to sensor state
 %     timeout: Number of seconds to wait for ros messages
@@ -24,7 +26,8 @@
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
 %   [enc_left, enc_right, time] = get_encoder_counts(turtle)
-%   [v, w] = get_linear_angular_velocity(turtle)
+%   [theta] = get_imu(turtle)
+%   [v, w, time] = get_linear_angular_velocity(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
 %   set_wheel_speeds(turtle, W_R, W_L)
@@ -44,6 +47,7 @@ classdef Turtlebot_GT < handle
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         odom_sub     % Subscriber to /odom topic
+        imu_sub      % Subscriber to /imu topic
         odom_prev    % Previous position
         sensor_sub   % Subscriber to sensor state
         timeout      % Number of seconds to wait for ros messages
@@ -61,6 +65,7 @@ classdef Turtlebot_GT < handle
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
+            turtle.imu_sub = rossubscriber('/imu');                           
             turtle.odom_sub = rossubscriber('/odom');
             turtle.odom_prev = getOdometry(turtle.turtlebot);
             turtle.sensor_sub = rossubscriber('/sensor_state');
@@ -101,6 +106,23 @@ classdef Turtlebot_GT < handle
             enc_right = sensor_msg.RightEncoder;
             t_ros_msg = sensor_msg.Stamp;
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
+        end
+        
+        function [theta] = get_imu(turtle)
+            % Returns the angle as measured by the gyroscope
+            %
+            % Usage: theta = turtlebot.get_imu()
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - theta = heading angle [rad]
+            
+            imu_msg = receive(turtle.imu_sub,turtle.timeout);
+            orientation = imu_msg.Orientation;
+            quat = [orientation.W, orientation.X, orientation.Y, orientation.Z];
+            euler = quat2eul(quat);
+            theta = euler(1);
         end
         
         function [v, w, time] = get_linear_angular_velocity(turtle)
