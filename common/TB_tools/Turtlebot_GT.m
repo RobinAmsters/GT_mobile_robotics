@@ -99,7 +99,7 @@ classdef Turtlebot_GT < handle
             sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             enc_left = sensor_msg.LeftEncoder;
             enc_right = sensor_msg.RightEncoder;
-            t_ros_msg = sensor_msg.Stamp;
+            t_ros_msg = sensor_msg.Header.Stamp;
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
         end
         
