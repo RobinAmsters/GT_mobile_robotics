@@ -39,17 +39,17 @@ if show_output
         pose_est(i,:) = h.x_est(1:3)';
     end
     % Add bias;
-%     if bias ~= 0
-%         i_1 = [x_0(1), x_0(2) + path_length + bias]; % coordinate of first corner point
-%         i_2 = [i_1(1) - (path_length + bias), i_1(2)]; % coordinate of second corner point
-%         i_3 = [i_2(1), i_2(2)  - (path_length + bias)]; % coordinate of third corner point
-%         i_4 = [i_3(1) + path_length + bias, i_3(2)]; % coordinate of fourth corner point
-%         pose_est = [x_0(1), x_0(2);
-%                     i_1(1), i_1(2);
-%                     i_2(1), i_2(2);
-%                     i_3(1), i_3(2);
-%                     i_4(1), i_4(2);]
-%     end
+    if bias ~= 0
+        i_1 = [x_0(1), x_0(2) + path_length + bias]; % coordinate of first corner point
+        i_2 = [i_1(1) - (path_length + bias), i_1(2)]; % coordinate of second corner point
+        i_3 = [i_2(1), i_2(2)  - (path_length + bias)]; % coordinate of third corner point
+        i_4 = [i_3(1) + path_length + bias, i_3(2)]; % coordinate of fourth corner point
+        pose_est = [x_0(1), x_0(2);
+                    i_1(1), i_1(2);
+                    i_2(1), i_2(2);
+                    i_3(1), i_3(2);
+                    i_4(1), i_4(2);];
+    end
     
     % Plotting
     plot(pose_real(:,1), pose_real(:,2), 'black', 'DisplayName','Real position');
