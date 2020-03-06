@@ -44,6 +44,7 @@ classdef Turtlebot_GT < handle
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         odom_sub     % Subscriber to /odom topic
+                imu_sub      % Subscriber to /imu topic
         odom_prev    % Previous position
         sensor_sub   % Subscriber to sensor state
         timeout      % Number of seconds to wait for ros messages
@@ -61,6 +62,7 @@ classdef Turtlebot_GT < handle
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
+            turtle.imu_sub = rossubscriber('/imu');  
             turtle.odom_sub = rossubscriber('/odom');
             turtle.odom_prev = getOdometry(turtle.turtlebot);
             turtle.sensor_sub = rossubscriber('/sensor_state');
@@ -103,7 +105,24 @@ classdef Turtlebot_GT < handle
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
         end
         
-        function [v, w] = get_linear_angular_velocity(turtle)
+        function [theta] = get_imu(turtle)
+            % Returns the angle as measured by the gyroscope
+            %
+            % Usage: theta = turtlebot.get_imu()
+            %
+            % INPUTS:
+            %   - None
+            % OUTPUTS:
+            %   - theta = heading angle [rad]
+            
+            imu_msg = receive(turtle.imu_sub,turtle.timeout);
+            orientation = imu_msg.Orientation;
+            quat = [orientation.W, orientation.X, orientation.Y, orientation.Z];
+            euler = quat2eul(quat);
+            theta = euler(1);
+        end
+        
+        function [v, w, time] = get_linear_angular_velocity(turtle)
             % Return measured linear and angular velocity (based on encoder 
             % tics)
             %
@@ -118,9 +137,11 @@ classdef Turtlebot_GT < handle
             odom_msg = receive(turtle.odom_sub,turtle.timeout);
             v = odom_msg.Twist.Twist.Linear.X;
             w = odom_msg.Twist.Twist.Angular.Z;
+            t_ros_msg = odom_msg.Header.Stamp;
+            time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
             
         end
-        function [ds,dth] = get_odometry(turtle)
+        function [ds,dth,time] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
             %
@@ -137,7 +158,7 @@ classdef Turtlebot_GT < handle
             %           last function call.
             
             % Get odometry data
-            [odom,~] = getOdometry(turtle.turtlebot);
+            [odom,odom_msg] = getOdometry(turtle.turtlebot);
             
             % Extract relevant coordinates
             dx = odom.Position(1) - turtle.odom_prev.Position(1);
@@ -149,6 +170,10 @@ classdef Turtlebot_GT < handle
             
             % Save current position for next call
             turtle.odom_prev = odom;
+            
+            t_ros_msg = odom_msg.Header.Stamp;
+            time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
+            
         end
         
         function [scan] = get_scan(turtle)
