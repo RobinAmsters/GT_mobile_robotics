@@ -46,7 +46,7 @@ d = 0;
 maxrange = 5;
 while abs(d) <= dist
     % Receive laser scan and odometry DATA
-    [ds,dth] = turtlebot.get_Odometry();
+    [ds,dth] = turtlebot.get_odometry();
     
     % Predict new pose with motion model
     [~, pose] = motionModel(pose, Pcov, ds, dth, 1);
@@ -67,7 +67,7 @@ maxrange = 5;
 th = 0;
 while abs(th) <= angle
     % Receive laser scan and odometry DATA
-    [ds,dth] = turtlebot.get_Odometry();
+    [ds,dth] = turtlebot.get_odometry();
     
     % Predict new pose with motion model
     [~, pose] = motionModel(pose, Pcov, ds, dth, 1);

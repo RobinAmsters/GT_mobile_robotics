@@ -9,5 +9,5 @@ n_loops = 1;     % Select number of simulations to show
 
 for i=linspace(1,n_loops,n_loops)
     figure()
-    simulate_configuration(config_ID)   % show output
+    simulate_configuration(config_ID);   % show output
 end

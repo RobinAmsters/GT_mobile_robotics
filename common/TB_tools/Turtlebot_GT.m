@@ -65,7 +65,7 @@ classdef Turtlebot_GT < handle
             turtle.turtlebot = turtlebot(ip);                                 % Initialize turtlebot object (depends on turtlebot support package)
             turtle.vel_pub = rospublisher('/cmd_vel', 'geometry_msgs/Twist'); % ROS publisher for velocity commands
             turtle.vel_msg = rosmessage(turtle.vel_pub);
-            turtle.imu_sub = rossubscriber('/imu');                           
+            turtle.imu_sub = rossubscriber('/imu');  
             turtle.odom_sub = rossubscriber('/odom');
             turtle.odom_prev = getOdometry(turtle.turtlebot);
             turtle.sensor_sub = rossubscriber('/sensor_state');
@@ -104,7 +104,7 @@ classdef Turtlebot_GT < handle
             sensor_msg = receive(turtle.sensor_sub,turtle.timeout);
             enc_left = sensor_msg.LeftEncoder;
             enc_right = sensor_msg.RightEncoder;
-            t_ros_msg = sensor_msg.Stamp;
+            t_ros_msg = sensor_msg.Header.Stamp;
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
         end
         
@@ -145,7 +145,7 @@ classdef Turtlebot_GT < handle
             time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
             
         end
-        function [ds,dth] = get_odometry(turtle)
+        function [ds,dth,time] = get_odometry(turtle)
             % Return distance driven and angle turned since the last call
             % to this function.
             %
@@ -162,7 +162,7 @@ classdef Turtlebot_GT < handle
             %           last function call.
             
             % Get odometry data
-            [odom,~] = getOdometry(turtle.turtlebot);
+            [odom,odom_msg] = getOdometry(turtle.turtlebot);
             
             % Extract relevant coordinates
             dx = odom.Position(1) - turtle.odom_prev.Position(1);
@@ -174,6 +174,10 @@ classdef Turtlebot_GT < handle
             
             % Save current position for next call
             turtle.odom_prev = odom;
+            
+            t_ros_msg = odom_msg.Header.Stamp;
+            time = double(t_ros_msg.Sec)+double(t_ros_msg.Nsec)*10^-9;
+            
         end
         
         function [scan] = get_scan(turtle)

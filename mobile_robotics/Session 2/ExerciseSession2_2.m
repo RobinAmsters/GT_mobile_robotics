@@ -1,55 +1,116 @@
-clear all;
-close all;
+close all
+clear all
 
-startup_rvc
+%% Parameters
+dt = 0.05; % Size of timestepss
+n_iterations = 20/dt;
+v = 75;
+altitude = 1000;
 
-%% Exercise 1: Dead reckoning
+%% Intial state estimate
+% Initial state estimate x0 (it is a column vector!!!):
+x0=[$$];
 
-% Making the EKF object
-Q=[0.0001^2 0  ; 0 (0.01)^2];  % noise on travelled distance[m] and the heading angle [rad]
-veh = Roomba(Q,'x0',[$$],'dt',0.01,'stlim',2*pi);
-veh.add_driver(SquarePath(1)); % 1 [m] is the length of the side of the square 
-P0=diag([$$].^2); % initial uncertainty of the state
-ekf = EKF(veh,Q, P0); 
+% The covariance matric of the uncertainty of the initial state estimate P0:
+P0=[$$];
 
-% Run simulation
-ekf.run(800); 
+%% Covariance matrices
+% Covariance of the state prediction Q:
+Q=[$$];
 
-% Plotting
-veh.plot_xy('b');
+% Covariance matric of the uncertainty on the measurements R:
+R=[$$];
+
+%% The state prediction matrix:
+F=[$$];
+
+
+%% Input signals
+t = [0:dt:dt*n_iterations];
+nsteps=size(t,2);
+
+%% The measurements collected in a matrix with every column a new measurement:
+X_real = v*t;
+V_real = v*ones(1,nsteps);
+Y_real = altitude*ones(1,nsteps);
+
+P=P0;
+x=x0;
+Xtot=[];
+Ptot=[];
+Z_measured = ones(1,nsteps);
+noise = ones(1,nsteps);
+
+%% Main loop
+for i=1:nsteps
+    %process model:
+    Xtilde = F*x;
+    Ptilde = F*P*F'+Q;
+    
+    %Measurement model:
+    [z] = simulate_radar([X_real(i); V_real(i); Y_real(i)], R);
+    Z_measured(i) = z;
+    [h, H] = radar_model(Xtilde);
+    
+    % Update step
+    K=Ptilde*H'*inv(H*Ptilde*H'+R);
+    x= Xtilde + K*(z-h);
+    P=(eye(size(K,1),size(K,1))-K*H)*Ptilde;
+    
+    Xtot = [Xtot,x];
+    Ptot=[Ptot diag(P)];
+end
+
+%% Plotting
+
+% Position plots
+figure(1)
+subplot(231)
+plot(t,Xtot(1,:))
 hold on
-ekf.plot_xy('r');
-ekf.plot_ellipse([], 'g');
-legend('Desired path followed by the Roomba','Estimated path based on the odometry');
+plot(t,X_real)
+ylabel('Position [m]')
+xlabel('Time [s]')
+legend('Estimated position','Real position')
+grid on
 
-pause % Stop MATLAB untill a key is pressed
-%% Exercise 2: Extended Kalman filter
-
-% Constructing the map
-figure()
-M=zeros(100,100);
-M(100,:)=1; M(1,:)=1; M(:,1)=1;M(:,100)=1;
-
-map = sMap(M,2); % take as features the corners in the map (M) ans as cartesian 
-%dimension of the binary map -dim to dim (=2)
-
-map.plot();
-
-% Making the EKF object
-V=[0.01^2 0  ; 0 (0.1)^2];  %%% noise on travelled distance and the heading angle 
-veh = Roomba(V,'x0',[0,0,pi/2],'dt',0.01,'stlim',2*pi);
-veh.add_driver(SquarePath(1)); % 1 [m] is the length of the side of the square 
-W = diag([$$].^2); % Measurement noise
-sensor = RangeBearingSensor(veh, map, W);
-[z,i] = sensor.reading();
-ekf = EKF(veh, V, P0, sensor, W, map);
-
-% Run simulation
-ekf.run(800); 
-
-% Plotting
-veh.plot_xy('b');
+% Velocity plots
+subplot(232)
+plot(t,Xtot(2,:))
 hold on
-ekf.plot_xy('r');
-ekf.plot_ellipse([], 'g');
-legend('Desired path followed by the Roomba','Estimated path based on the odometry');
+plot(t,V_real)
+ylabel('Velocity [m/s]')
+xlabel('Time [s]')
+legend('Estimated velocity', 'Real velocity')
+grid on
+
+% Altitude plots
+subplot(233)
+plot(t,Xtot(3,:))
+hold on
+plot(t,Y_real)
+ylabel('Velocity [m/s]')
+xlabel('Time [s]')
+legend('Estimated altitude', 'Real altitude')
+grid on
+
+% Position residual plots
+subplot(234)
+plot(t,X_real - Xtot(1,:))
+ylabel('Position residual [m]')
+xlabel('Time [s]')
+grid on
+
+% Velocity residual plots
+subplot(235)
+plot(t,V_real - Xtot(2,:))
+ylabel('Velocity residual [m/s]')
+xlabel('Time [s]')
+grid on
+
+% Velocity residual plots
+subplot(236)
+plot(t,Y_real - Xtot(3,:))
+ylabel('Altitude residual [m]')
+xlabel('Time [s]')
+grid on

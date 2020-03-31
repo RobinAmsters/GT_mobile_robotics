@@ -104,7 +104,7 @@ classdef SquarePath < handle
             opt.waypoints = [zeros(dim/(opt.speed*opt.step),1), [opt.speed*opt.step:opt.speed*opt.step:dim]';
                              - [opt.speed*opt.step:opt.speed*opt.step:dim]',  dim*ones(dim/(opt.speed*opt.step),1);
                              -dim*ones(dim/(opt.speed*opt.step),1),-[-dim+(opt.speed*opt.step):opt.speed*opt.step:0]';
-                             [-dim+(opt.speed*opt.step):opt.speed*opt.step:0]',zeros(dim/(opt.speed*opt.step),1) ] 
+                             [-dim+(opt.speed*opt.step):opt.speed*opt.step:0]',zeros(dim/(opt.speed*opt.step),1) ];
             
             opt = tb_optparse(opt, varargin);
 

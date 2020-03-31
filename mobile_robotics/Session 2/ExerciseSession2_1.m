@@ -101,18 +101,17 @@ xlabel('Time [s]')
 legend('Estimated velocity', 'Real velocity')
 grid on
 
-% Position uncertainty plots
+% Position residual plots
 subplot(223)
-plot(t,sqrt(Ptot(1,:)))
-ylabel('Position uncertainty [m]')
+plot(t,X_real - Xtot(1,:))
+ylabel('Position residual [m]')
 xlabel('Time [s]')
-ylim([0,1])
 grid on
 
-% Velocity uncertainty plots
+% Velocity residual plots
 subplot(224)
 plot(t,sqrt(Ptot(2,:)))
-ylabel('Velocity uncertainty [m/s]')
+plot(t,V_real - Xtot(2,:))
+ylabel('Velocity residual [m/s]')
 xlabel('Time [s]')
-ylim([0,1])
 grid on

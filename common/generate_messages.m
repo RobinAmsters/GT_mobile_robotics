@@ -5,4 +5,4 @@ folder_path = fullfile(path)
 rosgenmsg(folder_path)
 
 % Run the next line seperately 
-rosmsg('show','turtlebot3_msgs/SensorState') 
+%rosmsg('show','turtlebot3_msgs/SensorState')
