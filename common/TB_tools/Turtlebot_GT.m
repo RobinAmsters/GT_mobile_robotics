@@ -7,6 +7,8 @@
 %                Package, but you will rarely need those.
 %     vel_pub: publisher object for the /cmd_vel topic
 %     vel_msg:  Twist message that gets published by the velocity publisher
+%     odom_sub: Subscriber to /odom topic
+%     imu_sub: Subscriber to /imu topic
 %     odom_prev: Previous position
 %     sensor_sub: Subscriber to sensor state
 %     timeout: Number of seconds to wait for ros messages
@@ -24,7 +26,8 @@
 % Functions:
 %   [V_battery] = get_battery_voltage(turtle)
 %   [enc_left, enc_right, time] = get_encoder_counts(turtle)
-%   [v, w] = get_linear_angular_velocity(turtle)
+%   [theta] = get_imu(turtle)
+%   [v, w, time] = get_linear_angular_velocity(turtle)
 %   [ds,dth] = get_odometry(turtle)
 %   [scan] = get_scan(turtle)
 %   set_wheel_speeds(turtle, W_R, W_L)
@@ -44,7 +47,7 @@ classdef Turtlebot_GT < handle
         vel_pub      % publisher object for the /cmd_vel node
         vel_msg      % Twist message that gets published by the velocity publisher
         odom_sub     % Subscriber to /odom topic
-                imu_sub      % Subscriber to /imu topic
+        imu_sub      % Subscriber to /imu topic
         odom_prev    % Previous position
         sensor_sub   % Subscriber to sensor state
         timeout      % Number of seconds to wait for ros messages
@@ -126,13 +129,14 @@ classdef Turtlebot_GT < handle
             % Return measured linear and angular velocity (based on encoder 
             % tics)
             %
-            % Usage: [v, w] = turtlebot.get_linear_angular_velocity()
+            % Usage: [v, w, time] = turtlebot.get_linear_angular_velocity()
             %
             % INPUTS:
             %   - None
             % OUTPUTS:
             %   - v = forward velocity along direction of turtlebot [m/s]
             %   - w = angular velocity around vertical [rad/s]
+            %   - time = message timestamp converted to UNIX time [s]
             
             odom_msg = receive(turtle.odom_sub,turtle.timeout);
             v = odom_msg.Twist.Twist.Linear.X;
