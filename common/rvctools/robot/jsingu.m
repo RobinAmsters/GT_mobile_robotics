@@ -6,7 +6,8 @@
 % See also SerialLink.jacobn.
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -29,6 +30,7 @@ function jsingu(J)
 
     % convert to row-echelon form
     [R, jb] = rref(J);
+    R(abs(R) < 100*eps) = 0;
 
     depcols = setdiff( 1:numcols(J), jb);
 

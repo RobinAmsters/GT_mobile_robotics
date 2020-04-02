@@ -29,7 +29,7 @@ theta_robot = zeros(1,n); % Actual angle of robot
 map = LandmarkMap(20,20);
 
 % Sensor object
-W = diag([0.01, deg2rad(1)].^2); % Uncertainty on range and bearing measureùents
+W = diag([0.01, deg2rad(1)].^2) % Uncertainty on range and bearing measureùents
 sensor = RangeBearingSensor(vehicle, map, W);
 
 % Driver object
@@ -52,7 +52,6 @@ for i=i:n
 
     % Plot results
     vehicle.plot()
-    pause(0.1)
     sensor.plot(identity);
 
 end
