@@ -1,4 +1,4 @@
-% Astar (A*)
+% Astar 
 % A* navigation class
 % 
 % A concrete subclass of the Navigation class that implements the A*
@@ -23,27 +23,27 @@
 % 
 % Example 1::
 %        load map1              % load map
-%        goal = [50,30];
-%        start=[20,10];
+%        goal = [50;30];
+%        start=[20;10];
 %        as = Astar(map);       % create Navigation object
 %        as.plan(goal,2,3,0);   % setup costmap for specified goal; 
 %                               % standard D* algorithm w/ 2 objectives
 %                               % and 3 costmap layers
-%        as.path(start);		% plan solution path start-to-goal, animate
-%        P = as.path(start);	% plan solution path start-to-goal, return 
+%        as.path(start);        % plan solution path start-to-goal, animate
+%        P = as.path(start);    % plan solution path start-to-goal, return 
 %                               % path
 % Example 2::
-%       goal = [100;100];
-%       start = [1;1];
-%       as = Astar(0);          % create Navigation object with pseudo-
-%                               % random occupancy grid
-%       ds.addCost(terrain);    % terrain is a 100x100 matrix of 
-%                               % elevations [0,1]
-% 	    ds.plan(goal,3,4,0);    % setup costmap for specified goal
-%                               % (3 and 4 include the added terrain cost)
-%       as.path(start);         % plan solution path start-goal, animate
-%       P = as.path(start);     % plan solution path start-goal, return 
-%                               % path
+%        goal = [100;100];
+%        start = [1;1];
+%        as = Astar(0);          % create Navigation object with pseudo-
+%                                % random occupancy grid
+%        ds.addCost(terrain);    % terrain is a 100x100 matrix of 
+%                                % elevations [0,1]
+% 	     ds.plan(goal,3,4,0);    % setup costmap for specified goal
+%                                % (3 and 4 include the added terrain cost)
+%        as.path(start);         % plan solution path start-goal, animate
+%        P = as.path(start);     % plan solution path start-goal, return 
+%                                % path
 %     
 % Notes
 % - Obstacles are represented by Inf in the costmap.
@@ -56,7 +56,8 @@
 % 
 % See Also Navigation, Dstar
 
-% Copyright (C) 1993-2015, by Peter I. Corke, Alexander Lavin
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -74,9 +75,6 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
 % http://www.petercorke.com
-%
-% The RTB implementation of this algorithm is done by Alexander Lavin.
-% http://alexanderlavin.com
 
 
 % Implementation notes:
@@ -305,7 +303,11 @@ classdef Astar < Navigation
 
             % Invoke the superclass path function, which iterates on our
             % next method
-            start = [start; 1];  % specifies backpropogation for NAV.path()
+%             start = [start; 1];  % specifies backpropogation for NAV.path()
+%             temp = start;
+%             start = as.goal;
+%             as.goal = temp;
+            
             if nargout == 0
                 path@Navigation(as, start);
             else
@@ -479,6 +481,11 @@ classdef Astar < Navigation
             end
             
             as.costmap(:,:,k+1) = values;
+        end
+        
+        
+        function flag = backProp(as)
+            flag = 1;
         end
         
     end  % end of public methods
