@@ -36,6 +36,8 @@
 %   x_hist          history of true vehicle state (Nx3)
 %   driver          reference to the driver object
 %   x0              initial state, restored on init()
+%   theta_IMU       Angle as estimated by the IMU
+%   V_IMU           IMU covariance
 %
 % Examples::
 %
